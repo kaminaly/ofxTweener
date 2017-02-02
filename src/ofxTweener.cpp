@@ -15,21 +15,21 @@ ofxTweener::ofxTweener(){
 	setMode(TWEENMODE_OVERRIDE);
 }
 
-void ofxTweener::addTween(float &var, float to, float time, void (^callback)(float * arg)){
-	addTween(var,to,time, &ofxTransitions::easeOutExpo ,0,0,false, callback);
+void ofxTweener::addTween(float &var, float to, float time, TweenCompleteListener* listener){
+	addTween(var,to,time, &ofxTransitions::easeOutExpo ,0,0,false, listener);
 }
 
-void ofxTweener::addTween(float &var, float to, float time, float (ofxTransitions::*ease) (float,float,float,float), void (^callback)(float * arg)){
-	addTween(var,to,time,ease,0,0,false, callback);
+void ofxTweener::addTween(float &var, float to, float time, float (ofxTransitions::*ease) (float,float,float,float), TweenCompleteListener* listener){
+	addTween(var,to,time,ease,0,0,false, listener);
 }
-void ofxTweener::addTween(float &var, float to, float time, float (ofxTransitions::*ease) (float,float,float,float), float delay, void (^callback)(float * arg)){
-	addTween(var,to,time,ease,delay,0,false, callback);
+void ofxTweener::addTween(float &var, float to, float time, float (ofxTransitions::*ease) (float,float,float,float), float delay, TweenCompleteListener* listener){
+	addTween(var,to,time,ease,delay,0,false, listener);
 }
-void ofxTweener::addTween(float &var, float to, float time, float (ofxTransitions::*ease) (float,float,float,float), float delay, float bezierPoint, void (^callback)(float * arg)){
-	addTween(var,to,time,ease,delay, bezierPoint, true, callback);
+void ofxTweener::addTween(float &var, float to, float time, float (ofxTransitions::*ease) (float,float,float,float), float delay, float bezierPoint, TweenCompleteListener* listener){
+	addTween(var,to,time,ease,delay, bezierPoint, true, listener);
 }
 	
-void ofxTweener::addTween(float &var, float to, float time, float (ofxTransitions::*ease) (float,float,float,float), float delay, float bezierPoint, bool useBezier, void (^callback)(float * arg)){
+void ofxTweener::addTween(float &var, float to, float time, float (ofxTransitions::*ease) (float,float,float,float), float delay, float bezierPoint, bool useBezier, TweenCompleteListener* listener){
 	float from = var;
 	float _delay = delay;
 	Poco::Timestamp latest = 0;
@@ -68,10 +68,12 @@ void ofxTweener::addTween(float &var, float to, float time, float (ofxTransition
 	t._easeFunction = ease;
 	t._timestamp = Poco::Timestamp() + ((delay / _scale) * 1000000.0f) ;
 	t._duration = (time / _scale) * 1000000.0f;
-	
+    t._completeListener = listener;
+    if (listener != NULL) {
+        ofAddListener(t._completeEvent, listener, &TweenCompleteListener::tweenOnComplete);
+    }
+    
 	tweens.push_back(t);
-	
-    if (callback!=NULL) callbacks[t._var] = callback;
 }
 
 void ofxTweener::update(){
@@ -91,11 +93,12 @@ void ofxTweener::update(){
 			}
 			if(!found) tweens[i]._var[0] = tweens[i]._to;
             
-            map<float *,void (^)(float * arg)>::iterator it = callbacks.find(tweens[i]._var);
-            if(it != callbacks.end()) {
-                it->second(tweens[i]._var);
-                callbacks.erase(it);
+            if (tweens[i]._completeListener != NULL) {
+                TweenCompleteEventArgs args(tweens[i]._var);
+                ofNotifyEvent(tweens[i]._completeEvent, args);
+                ofRemoveListener(tweens[i]._completeEvent, tweens[i]._completeListener, &TweenCompleteListener::tweenOnComplete);
             }
+            
             tweens.erase(tweens.begin() + i);
 			
 		}
