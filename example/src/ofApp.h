@@ -22,7 +22,7 @@ class ofApp : public ofBaseApp, public TweenCompleteListener{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
-        virtual void tweenOnComplete(TweenCompleteEventArgs& args);
+        virtual void tweenOnComplete(float& args);
         ofPoint position;
         float radius;
     

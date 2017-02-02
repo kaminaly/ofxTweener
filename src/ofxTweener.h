@@ -17,15 +17,9 @@
 #define TWEENMODE_SEQUENCE 0x02
 
 
-class TweenCompleteEventArgs {
-public:
-    TweenCompleteEventArgs(float* target):value(target){};
-    float* value;
-};
-
 class TweenCompleteListener {
 public:
-    virtual void tweenOnComplete(TweenCompleteEventArgs& args){}
+    virtual void tweenOnComplete(float& args){}
 };
 
 
@@ -38,7 +32,7 @@ public:
 	Poco::Timestamp _timestamp;
     
     TweenCompleteListener* _completeListener;
-    ofEvent<TweenCompleteEventArgs> _completeEvent;
+    ofEvent<float> _completeEvent;
 };
 
 

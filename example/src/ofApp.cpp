@@ -95,9 +95,9 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 }
 
 
-void ofApp::tweenOnComplete(TweenCompleteEventArgs& args){
-    if(args.value == &position.x) ofLogNotice() << "on complete x: " << position.x;
-    if(args.value == &position.y) ofLogNotice() << "on complete y: " << position.y;
+void ofApp::tweenOnComplete(float& args){
+    if(&args == &position.x) ofLogNotice() << "on complete x: " << position.x;
+    if(&args == &position.y) ofLogNotice() << "on complete y: " << position.y;
 }
 
 

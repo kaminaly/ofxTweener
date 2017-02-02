@@ -94,8 +94,7 @@ void ofxTweener::update(){
 			if(!found) tweens[i]._var[0] = tweens[i]._to;
             
             if (tweens[i]._completeListener != NULL) {
-                TweenCompleteEventArgs args(tweens[i]._var);
-                ofNotifyEvent(tweens[i]._completeEvent, args);
+                ofNotifyEvent(tweens[i]._completeEvent, *tweens[i]._var);
                 ofRemoveListener(tweens[i]._completeEvent, tweens[i]._completeListener, &TweenCompleteListener::tweenOnComplete);
             }
             
