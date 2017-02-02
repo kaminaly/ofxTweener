@@ -114,6 +114,9 @@ void ofxTweener::removeTween(float &var){
 	for(int i = 0; i < tweens.size(); i++){
 		if(tweens[i]._var == &var) {
 			// tween found, erase it
+            if (tweens[i]._completeListener != NULL) {
+                ofRemoveListener(tweens[i]._completeEvent, tweens[i]._completeListener, &TweenCompleteListener::tweenOnComplete);
+            }
 			tweens.erase(tweens.begin() + i); 
 			return;
 		}
@@ -125,6 +128,11 @@ float ofxTweener::bezier(float b, float e, float t, float p){
 }
 
 void ofxTweener::removeAllTweens(){
+    for(int i = 0; i < tweens.size(); i++){
+        if (tweens[i]._completeListener != NULL) {
+            ofRemoveListener(tweens[i]._completeEvent, tweens[i]._completeListener, &TweenCompleteListener::tweenOnComplete);
+        }
+    }
 	tweens.clear();
 }
 void ofxTweener::setMode(int mode){
